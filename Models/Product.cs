@@ -12,13 +12,13 @@ namespace Demo3DAPI.Models
         [StringLength(200)]
         public string ProductName { get; set; } = string.Empty;
 
-        // "decimal" là kiểu dữ liệu tốt nhất cho tiền tệ (PRICE)
-        [Column(TypeName = "decimal(18, 2)")] // Giúp SQL lưu trữ tiền chính xác
+       
+        [Column(TypeName = "decimal(18, 2)")] 
         public decimal Price { get; set; }
 
-        public int CategoryID { get; set; }
+     
+        [Column(TypeName = "nvarchar(max)")]
+        public string? Dis { get; set; }
 
-        [ForeignKey("CategoryID")]
-        public virtual Category? Category { get; set; }
     }
 }
