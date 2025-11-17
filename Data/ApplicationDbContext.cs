@@ -12,7 +12,8 @@ namespace Demo3DAPI.Data
         public DbSet<PlayerAccount> PlayerAccounts { get; set; }
         public DbSet<PlayerCharacter> PlayerCharacters { get; set; }
 
-        public DbSet<Role> Roles { get; set; }  
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Bill> Bills { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
