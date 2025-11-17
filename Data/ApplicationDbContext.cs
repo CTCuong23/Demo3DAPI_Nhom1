@@ -12,7 +12,9 @@ namespace Demo3DAPI.Data
         public DbSet<PlayerAccount> PlayerAccounts { get; set; }
         public DbSet<PlayerCharacter> PlayerCharacters { get; set; }
 
-        public DbSet<Role> Roles { get; set; }  
+        public DbSet<Role> Roles { get; set; }
+
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,7 +48,15 @@ namespace Demo3DAPI.Data
                        .WithMany(r => r.PlayerAccounts)
                        .HasForeignKey(a => a.RoleID)
                        .OnDelete(DeleteBehavior.Restrict);
-            });     
+            });
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .HasForeignKey(p => p.CategoryID)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
