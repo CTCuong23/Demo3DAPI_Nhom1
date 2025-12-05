@@ -114,8 +114,12 @@ namespace Demo3DAPI.Migrations
                         {
                             ID = 1,
                             FullName = "Admin",
+
                             Password = "$2a$11$cG0arvdsgytXohiKvQZQzupoLPafBKjOvHrFzBpsOsDDKPfX1iBvW",
                             Password = "$2a$11$1xjsNGmitfAGs.WH5PNdtuDiUXDXJYfiPDxrK/RDMOxIdMbyQuJQy",
+
+                            Password = "$2a$11$obR2AsqZJ57GCE8CzO/4AOCLrQoXEHo.JRVv1IYWeJcEsfpXtkKcq",
+
                             RoleID = 1,
                             UserName = "admin"
                         });
@@ -155,8 +159,11 @@ namespace Demo3DAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("CategoryID")
+                    b.Property<int?>("CategoryID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Dis")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
@@ -170,7 +177,7 @@ namespace Demo3DAPI.Migrations
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Demo3DAPI.Models.Role", b =>
@@ -237,14 +244,18 @@ namespace Demo3DAPI.Migrations
 
             modelBuilder.Entity("Demo3DAPI.Models.Product", b =>
                 {
-                    b.HasOne("Demo3DAPI.Models.Category", "Category")
+                    b.HasOne("Demo3DAPI.Models.Category", null)
                         .WithMany("Products")
+ 
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
+
+                        .HasForeignKey("CategoryID");
+ 
                 });
 
             modelBuilder.Entity("Demo3DAPI.Models.Category", b =>

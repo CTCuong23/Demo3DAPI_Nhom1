@@ -16,7 +16,7 @@ namespace Demo3DAPI.Data
         public DbSet<Bill> Bills { get; set; }
 
         public DbSet<Category> Categories { get; set; }
-
+        public DbSet<Product> Products { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var adminRole = new Role { Id = 1, Name = "Admin" };
@@ -51,13 +51,13 @@ namespace Demo3DAPI.Data
                        .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<Category>(entity =>
-            {
-                entity.HasMany(c => c.Products)
-                .WithOne(p => p.Category)
-                .HasForeignKey(p => p.CategoryID)
-                .OnDelete(DeleteBehavior.Restrict);
-            });
+            //modelBuilder.Entity<Category>(entity =>
+            //{
+            //    entity.HasMany(c => c.Products)
+            //    .WithOne(p => p.Category)
+            //    .HasForeignKey(p => p.CategoryID)
+            //    .OnDelete(DeleteBehavior.Restrict);
+            //});
         }
     }
 }

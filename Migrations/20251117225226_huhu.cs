@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Demo3DAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreateFinal : Migration
+    public partial class huhu : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -41,24 +41,24 @@ namespace Demo3DAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "Products",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CategoryID = table.Column<int>(type: "int", nullable: false)
+                    Dis = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.ID);
+                    table.PrimaryKey("PK_Products", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Product_Categories_CategoryID",
+                        name: "FK_Products_Categories_CategoryID",
                         column: x => x.CategoryID,
                         principalTable: "Categories",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -139,7 +139,7 @@ namespace Demo3DAPI.Migrations
             migrationBuilder.InsertData(
                 table: "PlayerAccounts",
                 columns: new[] { "ID", "FullName", "Password", "PhoneNumber", "RoleID", "UserName" },
-                values: new object[] { 1, "Admin", "$2a$11$cG0arvdsgytXohiKvQZQzupoLPafBKjOvHrFzBpsOsDDKPfX1iBvW", null, 1, "admin" });
+                values: new object[] { 1, "Admin", "$2a$11$obR2AsqZJ57GCE8CzO/4AOCLrQoXEHo.JRVv1IYWeJcEsfpXtkKcq", null, 1, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bills_PlayerAccountId",
@@ -157,8 +157,8 @@ namespace Demo3DAPI.Migrations
                 column: "PlayerAccountID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_CategoryID",
-                table: "Product",
+                name: "IX_Products_CategoryID",
+                table: "Products",
                 column: "CategoryID");
         }
 
@@ -172,7 +172,7 @@ namespace Demo3DAPI.Migrations
                 name: "PlayerCharacters");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "PlayerAccounts");
