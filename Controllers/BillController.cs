@@ -48,7 +48,7 @@ namespace Demo3DAPI.Controllers
             }
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPut("Update/{id}")]
         [SwaggerOperation(Summary = "Sửa hóa đơn")]
         public async Task<IActionResult> PutBill(int id, Bill bill)
         {
@@ -60,7 +60,7 @@ namespace Demo3DAPI.Controllers
             return Ok("Update Success");
         }
 
-        [HttpPost("Delete/{id}")]
+        [HttpDelete("Delete/{id}")]
         [SwaggerOperation(Summary = "Xóa hóa đơn")]
         public async Task<IActionResult> DeleteBill(int id)
         {

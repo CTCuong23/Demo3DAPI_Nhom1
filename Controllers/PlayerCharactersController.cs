@@ -62,7 +62,7 @@ namespace Demo3DAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = newCharacter.ID }, newCharacter);
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPut("Update/{id}")]
         [SwaggerOperation(Summary = "Sửa nhân vật", Description = "Cập nhật thông tin nhân vật theo ID")]
         [SwaggerResponse(200, "Cập nhật thành công")]
         [SwaggerResponse(404, "Không tìm thấy nhân vật")]
@@ -73,7 +73,7 @@ namespace Demo3DAPI.Controllers
             return Ok(new { message = "Character updated successfully." });
         }
 
-        [HttpPost("Delete/{id}")]
+        [HttpDelete("Delete/{id}")]
         [SwaggerOperation(Summary = "Xóa nhân vật", Description = "Xóa nhân vật theo ID")]
         [SwaggerResponse(200, "Xóa thành công")]
         [SwaggerResponse(404, "Không tìm thấy nhân vật")]
