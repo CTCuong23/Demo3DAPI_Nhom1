@@ -114,7 +114,6 @@ namespace Demo3DAPI.Migrations
                         {
                             ID = 1,
                             FullName = "Admin",
-                            Password = "$2a$11$cG0arvdsgytXohiKvQZQzupoLPafBKjOvHrFzBpsOsDDKPfX1iBvW",
                             Password = "$2a$11$1xjsNGmitfAGs.WH5PNdtuDiUXDXJYfiPDxrK/RDMOxIdMbyQuJQy",
                             RoleID = 1,
                             UserName = "admin"
@@ -240,9 +239,8 @@ namespace Demo3DAPI.Migrations
                     b.HasOne("Demo3DAPI.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict) // Xóa dòng trùng lắp bên dưới đi
+                        .IsRequired(); // Kết thúc lệnh tại đây là đúng
 
                     b.Navigation("Category");
                 });

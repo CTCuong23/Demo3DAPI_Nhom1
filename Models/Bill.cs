@@ -15,7 +15,7 @@ namespace Demo3DAPI.Models
         public DateTime? PaymentDate { get; set; }
 
         [Required]
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         public int PlayerAccountId { get; set; }
 
