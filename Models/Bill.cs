@@ -21,5 +21,7 @@ namespace Demo3DAPI.Models
 
         [ForeignKey("PlayerAccountId")]
         public virtual PlayerAccount? PlayerAccount { get; set; }
+
+        public virtual ICollection<BillDetail> BillDetails { get; set; } = new List<BillDetail>();
     }
 }

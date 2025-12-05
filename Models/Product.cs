@@ -22,5 +22,7 @@ namespace Demo3DAPI.Models
 
         [ForeignKey("CategoryID")]
         public virtual Category? Category { get; set; }
+
+        public virtual ICollection<BillDetail> BillDetails { get; set; } = new List<BillDetail>();
     }
 }

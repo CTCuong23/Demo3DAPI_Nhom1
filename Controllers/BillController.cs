@@ -1,7 +1,6 @@
-﻿using Demo3DAPI.Data;
+﻿using Demo3DAPI.Interfaces;
 using Demo3DAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Demo3DAPI.Controllers
@@ -10,72 +9,38 @@ namespace Demo3DAPI.Controllers
     [ApiController]
     public class BillsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBillService _billService;
 
-        public BillsController(ApplicationDbContext context)
+        public BillsController(IBillService billService)
         {
-            _context = context;
+            _billService = billService;
         }
 
         [HttpGet("GetAll")]
-        [SwaggerOperation(Summary = "Xem tất cả hóa đơn", Description = "Lấy danh sách tất cả các hóa đơn")]
-        [SwaggerResponse(200, "Thành công", typeof(IEnumerable<PlayerAccount>))]
+        [SwaggerOperation(Summary = "Xem tất cả hóa đơn")]
         public async Task<IActionResult> GetBills()
         {
-            try
-            {
-                var data = await _context.Bills
-                                         .Include(b => b.PlayerAccount) 
-                                         .ToListAsync();
-                return Ok(new { data = data });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var bills = await _billService.GetAllBills();
+            return Ok(new { data = bills });
         }
-        //public async Task<IActionResult> GetAll()
-        //{
-        //    var accounts = await _context.GetAllBill();
-        //    return Ok(accounts);
-        //}
 
         [HttpGet("GetById/{id}")]
-        [SwaggerOperation(Summary = "Xem một hóa đơn", Description = "Lấy thông tin chi tiết hóa đơn theo ID")]
-        [SwaggerResponse(200, "Thành công", typeof(Bill))]
-        [SwaggerResponse(404, "Không tìm thấy hóa đơn")]
+        [SwaggerOperation(Summary = "Xem một hóa đơn")]
         public async Task<IActionResult> GetBill(int id)
         {
-            try
-            {
-                var data = await _context.Bills
-                                         .Include(b => b.PlayerAccount)
-                                         .FirstOrDefaultAsync(b => b.Id == id);
-                if (data == null)
-                {
-                    return NotFound();
-                }
-                return Ok(new { data = data });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var bill = await _billService.GetBillById(id);
+            if (bill == null) return NotFound("Không tìm thấy hóa đơn");
+            return Ok(new { data = bill });
         }
 
         [HttpPost("Create")]
-        [SwaggerOperation(Summary = "Thêm hóa đơn mới", Description = "Tạo hóa đơn mới")]
-        [SwaggerResponse(201, "Tạo thành công", typeof(PlayerAccount))]
-        [SwaggerResponse(400, "Dữ liệu không hợp lệ")]
+        [SwaggerOperation(Summary = "Thêm hóa đơn mới")]
         public async Task<IActionResult> PostBill(Bill bill)
         {
             try
             {
-                bill.CreateDate = DateTime.Now;
-
-                _context.Bills.Add(bill);
-                await _context.SaveChangesAsync();
-                return Ok(new { data = bill });
+                var newBill = await _billService.CreateBill(bill);
+                return CreatedAtAction(nameof(GetBill), new { id = newBill.Id }, newBill);
             }
             catch (Exception ex)
             {
@@ -84,58 +49,25 @@ namespace Demo3DAPI.Controllers
         }
 
         [HttpPost("Update/{id}")]
-        [SwaggerOperation(Summary = "Sửa hóa đơn", Description = "Cập nhật thông tin hóa đơn theo ID")]
-        [SwaggerResponse(200, "Cập nhật thành công")]
-        [SwaggerResponse(404, "Không tìm thấy hóa đơn")]
+        [SwaggerOperation(Summary = "Sửa hóa đơn")]
         public async Task<IActionResult> PutBill(int id, Bill bill)
         {
-            if (id != bill.Id)
-            {
-                return BadRequest("ID không khớp.");
-            }
+            if (id != bill.Id) return BadRequest("ID không khớp.");
 
-            try
-            {
-                var billToUpdate = await _context.Bills.FindAsync(id);
-                if (billToUpdate == null)
-                {
-                    return NotFound("Không tìm thấy Bill để cập nhật.");
-                }
+            var result = await _billService.UpdateBill(id, bill);
+            if (!result) return NotFound("Không tìm thấy Bill để cập nhật.");
 
-                billToUpdate.PaymentDate = bill.PaymentDate;
-                billToUpdate.Status = bill.Status;
-
-                await _context.SaveChangesAsync();
-                return Ok("Update Success");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok("Update Success");
         }
 
         [HttpPost("Delete/{id}")]
-        [SwaggerOperation(Summary = "Xóa hóa đơn", Description = "Xóa hóa đơn theo ID (tự động xóa tất cả dữ liệu liên quan)")]
-        [SwaggerResponse(200, "Xóa thành công")]
-        [SwaggerResponse(404, "Không tìm thấy hóa đơn")]
+        [SwaggerOperation(Summary = "Xóa hóa đơn")]
         public async Task<IActionResult> DeleteBill(int id)
         {
-            try
-            {
-                var bill = await _context.Bills.FindAsync(id);
-                if (bill == null)
-                {
-                    return NotFound("Không tìm thấy bill để xóa");
-                }
+            var result = await _billService.DeleteBill(id);
+            if (!result) return NotFound("Không tìm thấy bill để xóa");
 
-                _context.Bills.Remove(bill);
-                await _context.SaveChangesAsync();
-                return Ok("Delete Success"); 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok("Delete Success");
         }
     }
 }
