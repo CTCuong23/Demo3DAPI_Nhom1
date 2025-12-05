@@ -4,6 +4,7 @@ using Demo3DAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Demo3DAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251118094606_AddRelationProductCategory")]
+    partial class AddRelationProductCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,7 +117,6 @@ namespace Demo3DAPI.Migrations
                         {
                             ID = 1,
                             FullName = "Admin",
-                            Password = "$2a$11$cG0arvdsgytXohiKvQZQzupoLPafBKjOvHrFzBpsOsDDKPfX1iBvW",
                             Password = "$2a$11$1xjsNGmitfAGs.WH5PNdtuDiUXDXJYfiPDxrK/RDMOxIdMbyQuJQy",
                             RoleID = 1,
                             UserName = "admin"
@@ -155,8 +157,11 @@ namespace Demo3DAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("CategoryID")
+                    b.Property<int?>("CategoryID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Dis")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
@@ -170,7 +175,7 @@ namespace Demo3DAPI.Migrations
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Demo3DAPI.Models.Role", b =>
@@ -240,8 +245,6 @@ namespace Demo3DAPI.Migrations
                     b.HasOne("Demo3DAPI.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");

@@ -18,6 +18,8 @@ namespace Demo3DAPI.Models
 
         public int CategoryID { get; set; }
 
+        public int? CategoryID { get; set; } 
+
         [ForeignKey("CategoryID")]
         public virtual Category? Category { get; set; }
     }
