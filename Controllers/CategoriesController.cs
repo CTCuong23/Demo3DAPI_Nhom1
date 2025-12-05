@@ -52,7 +52,7 @@ namespace Demo3DAPI.Controllers
             }
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPut("Update/{id}")]
         [SwaggerOperation(Summary = "Sửa danh mục")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDTO updateDto)
         {
@@ -64,7 +64,7 @@ namespace Demo3DAPI.Controllers
             return Ok(new { message = "Category updated successfully." });
         }
 
-        [HttpPost("Delete/{id}")]
+        [HttpDelete("Delete/{id}")]
         [SwaggerOperation(Summary = "Xóa danh mục")]
         public async Task<IActionResult> Delete(int id)
         {

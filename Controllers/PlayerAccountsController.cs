@@ -54,7 +54,7 @@ namespace Demo3DAPI.Controllers
             }
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPut("Update/{id}")]
         [SwaggerOperation(Summary = "Sửa tài khoản", Description = "Cập nhật thông tin tài khoản theo ID")]
         [SwaggerResponse(200, "Cập nhật thành công")]
         [SwaggerResponse(404, "Không tìm thấy tài khoản")]
@@ -65,7 +65,7 @@ namespace Demo3DAPI.Controllers
             return Ok(new { message = "Account updated successfully." });
         }
 
-        [HttpPost("Delete/{id}")]
+        [HttpDelete("Delete/{id}")]
         [SwaggerOperation(Summary = "Xóa tài khoản", Description = "Xóa tài khoản theo ID (tự động xóa tất cả Character liên quan)")]
         [SwaggerResponse(200, "Xóa thành công")]
         [SwaggerResponse(404, "Không tìm thấy tài khoản")]

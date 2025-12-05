@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Demo3DAPI.Models
 {
@@ -15,6 +16,7 @@ namespace Demo3DAPI.Models
 
         [Required]
         [StringLength(100)]
+        [JsonIgnore] // <--- 2. THÊM CÁI NÀY ĐỂ GIẤU MẬT KHẨU
         public string Password { get; set; } = string.Empty;
 
         [StringLength(100)]
