@@ -20,5 +20,12 @@ namespace Demo3DAPI.Models
         [Column(TypeName = "nvarchar(max)")]
         public string? Dis { get; set; }
 
+ 
+        public int? CategoryID { get; set; } 
+
+        [ForeignKey("CategoryID")]
+        public virtual Category? Category { get; set; }
+
+ 
     }
 }

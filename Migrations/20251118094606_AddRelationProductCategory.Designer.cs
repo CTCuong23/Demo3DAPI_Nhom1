@@ -4,6 +4,7 @@ using Demo3DAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Demo3DAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251118094606_AddRelationProductCategory")]
+    partial class AddRelationProductCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,12 +117,7 @@ namespace Demo3DAPI.Migrations
                         {
                             ID = 1,
                             FullName = "Admin",
-
-                            Password = "$2a$11$cG0arvdsgytXohiKvQZQzupoLPafBKjOvHrFzBpsOsDDKPfX1iBvW",
                             Password = "$2a$11$1xjsNGmitfAGs.WH5PNdtuDiUXDXJYfiPDxrK/RDMOxIdMbyQuJQy",
-
-                            Password = "$2a$11$obR2AsqZJ57GCE8CzO/4AOCLrQoXEHo.JRVv1IYWeJcEsfpXtkKcq",
-
                             RoleID = 1,
                             UserName = "admin"
                         });
@@ -244,18 +242,12 @@ namespace Demo3DAPI.Migrations
 
             modelBuilder.Entity("Demo3DAPI.Models.Product", b =>
                 {
-                    b.HasOne("Demo3DAPI.Models.Category", null)
+                    b.HasOne("Demo3DAPI.Models.Category", "Category")
                         .WithMany("Products")
- 
                         .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
-
-                        .HasForeignKey("CategoryID");
- 
                 });
 
             modelBuilder.Entity("Demo3DAPI.Models.Category", b =>
