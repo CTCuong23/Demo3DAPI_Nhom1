@@ -15,9 +15,12 @@ namespace Demo3DAPI.Data
         public DbSet<Bill> Bills { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+ 
 
         public DbSet<BillDetail> BillDetails { get; set; }
 
+
+ 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 1. Seed Roles
@@ -55,6 +58,7 @@ namespace Demo3DAPI.Data
                        .OnDelete(DeleteBehavior.Restrict);
             });
 
+ 
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasMany(c => c.Products)
@@ -88,6 +92,15 @@ namespace Demo3DAPI.Data
             });
 
             base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<Category>(entity =>
+            //{
+            //    entity.HasMany(c => c.Products)
+            //    .WithOne(p => p.Category)
+            //    .HasForeignKey(p => p.CategoryID)
+            //    .OnDelete(DeleteBehavior.Restrict);
+            //});
+ 
         }
     }
 }

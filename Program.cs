@@ -25,7 +25,10 @@ builder.Services.AddScoped<IPlayerAccountService, PlayerAccountService>();
 builder.Services.AddScoped<IPlayerCharacterService, PlayerCharacterService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
 builder.Services.AddScoped<IBillService, BillService>(); // <--- MỚI THÊM CÁI NÀY
+
+
 
 var app = builder.Build();
 
