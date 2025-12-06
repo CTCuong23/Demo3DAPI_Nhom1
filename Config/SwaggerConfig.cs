@@ -12,10 +12,36 @@ namespace Demo3DAPI.Config
                 {
                     Title = "Demo3D API",
                     Version = "v1",
-                    Description = "API for managing Player Accounts and Characters"
+                    Description = "API for managing Player Accounts and Characters with JWT Authentication"
                 });
 
                 c.EnableAnnotations();
+
+                // Phần này quan trọng: Thêm cấu hình nút Authorize (ổ khóa) cho Swagger
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Nhập token vào đây. Ví dụ: Bearer {token}"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
 
             return services;
@@ -35,4 +61,3 @@ namespace Demo3DAPI.Config
         }
     }
 }
-

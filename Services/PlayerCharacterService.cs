@@ -15,12 +15,14 @@ namespace Demo3DAPI.Services
             _context = context;
         }
 
-        public async Task<PlayerCharacter?> CreateCharacter(CreatePlayerCharacterDto characterDto)
+        public async Task<PlayerCharacterResponseDto?> CreateCharacter(CreatePlayerCharacterDto characterDto)
         {
-            var accountExists = await _context.PlayerAccounts.AnyAsync(a => a.ID == characterDto.PlayerAccountID);
-            if (!accountExists)
+            var account = await _context.PlayerAccounts.FindAsync(characterDto.PlayerAccountID);
+            if (account == null) return null;
+
+            if (characterDto.Level < 1)
             {
-                return null;
+                throw new InvalidOperationException("Level must be at least 1.");
             }
 
             var character = new PlayerCharacter
@@ -32,7 +34,16 @@ namespace Demo3DAPI.Services
 
             _context.PlayerCharacters.Add(character);
             await _context.SaveChangesAsync();
-            return character;
+
+            return new PlayerCharacterResponseDto
+            {
+                ID = character.ID,
+                Name = character.Name,
+                Level = character.Level,
+                PlayerAccountID = character.PlayerAccountID,
+                PlayerAccountUserName = account.UserName,
+                PlayerAccountFullName = account.FullName
+            };
         }
 
         public async Task<bool> DeleteCharacter(int id)
@@ -45,25 +56,55 @@ namespace Demo3DAPI.Services
             return true;
         }
 
-        public async Task<IEnumerable<PlayerCharacter>> GetAllCharacters()
+        public async Task<IEnumerable<PlayerCharacterResponseDto>> GetAllCharacters()
         {
             return await _context.PlayerCharacters
                 .Include(c => c.PlayerAccount)
+                .Select(c => new PlayerCharacterResponseDto
+                {
+                    ID = c.ID,
+                    Name = c.Name,
+                    Level = c.Level,
+                    PlayerAccountID = c.PlayerAccountID,
+                    PlayerAccountUserName = c.PlayerAccount != null ? c.PlayerAccount.UserName : null,
+                    PlayerAccountFullName = c.PlayerAccount != null ? c.PlayerAccount.FullName : null
+                })
                 .ToListAsync();
         }
 
-        public async Task<PlayerCharacter?> GetCharacterById(int id)
+        public async Task<PlayerCharacterResponseDto?> GetCharacterById(int id)
         {
-            return await _context.PlayerCharacters
+            var character = await _context.PlayerCharacters
                 .Include(c => c.PlayerAccount)
                 .FirstOrDefaultAsync(c => c.ID == id);
+
+            if (character == null) return null;
+
+            return new PlayerCharacterResponseDto
+            {
+                ID = character.ID,
+                Name = character.Name,
+                Level = character.Level,
+                PlayerAccountID = character.PlayerAccountID,
+                PlayerAccountUserName = character.PlayerAccount?.UserName,
+                PlayerAccountFullName = character.PlayerAccount?.FullName
+            };
         }
 
-        public async Task<IEnumerable<PlayerCharacter>> GetCharactersByAccountId(int accountId)
+        public async Task<IEnumerable<PlayerCharacterResponseDto>> GetCharactersByAccountId(int accountId)
         {
             return await _context.PlayerCharacters
                 .Include(c => c.PlayerAccount)
                 .Where(c => c.PlayerAccountID == accountId)
+                .Select(c => new PlayerCharacterResponseDto
+                {
+                    ID = c.ID,
+                    Name = c.Name,
+                    Level = c.Level,
+                    PlayerAccountID = c.PlayerAccountID,
+                    PlayerAccountUserName = c.PlayerAccount != null ? c.PlayerAccount.UserName : null,
+                    PlayerAccountFullName = c.PlayerAccount != null ? c.PlayerAccount.FullName : null
+                })
                 .ToListAsync();
         }
 
@@ -71,6 +112,11 @@ namespace Demo3DAPI.Services
         {
             var character = await _context.PlayerCharacters.FindAsync(id);
             if (character == null) return false;
+
+            if (characterDto.Level < 1)
+            {
+                throw new InvalidOperationException("Level must be at least 1.");
+            }
 
             character.Name = characterDto.Name;
             character.Level = characterDto.Level;
@@ -81,4 +127,3 @@ namespace Demo3DAPI.Services
         }
     }
 }
-
