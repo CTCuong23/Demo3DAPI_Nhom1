@@ -10,18 +10,18 @@ namespace Demo3DAPI.Models
         public int Id { get; set; }
 
         [Required]
-        public int BillId { get; set; } // Khóa ngoại trỏ về Bill
+        public int BillId { get; set; } 
 
         [Required]
-        public int ProductId { get; set; } // Khóa ngoại trỏ về Product
+        public int ProductId { get; set; } 
 
         [Required]
-        public int Quantity { get; set; } // Số lượng mua (ví dụ mua 5 bình máu)
+        public int Quantity { get; set; } 
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal UnitPrice { get; set; } // Giá tại thời điểm mua (để lỡ sau này Product tăng giá thì hóa đơn cũ không bị sai)
+        public decimal UnitPrice { get; set; } 
 
-        // Navigation Properties (Cầu nối)
+        
         [ForeignKey("BillId")]
         public virtual Bill? Bill { get; set; }
 

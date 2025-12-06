@@ -16,7 +16,7 @@ namespace Demo3DAPI.Models
 
         [Required]
         [StringLength(100)]
-        [JsonIgnore] // <--- 2. THÊM CÁI NÀY ĐỂ GIẤU MẬT KHẨU
+        [JsonIgnore] 
         public string Password { get; set; } = string.Empty;
 
         [StringLength(100)]

@@ -59,8 +59,8 @@ namespace Demo3DAPI.Services
                 return false;
             }
 
-            category.CategoryName = categoryDto.CategoryName ?? ""; // Nếu null thì lấy chuỗi rỗng
-            category.CategoryDescription = categoryDto.CategoryDescription ?? ""; // Tương tự
+            category.CategoryName = categoryDto.CategoryName ?? ""; 
+            category.CategoryDescription = categoryDto.CategoryDescription ?? ""; 
             _context.Entry(category).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return true;
