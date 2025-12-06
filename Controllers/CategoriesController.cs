@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // Cần cái này
 using Demo3DAPI.DTOs;
 using Demo3DAPI.Interfaces;
 using Demo3DAPI.Models;
 using Swashbuckle.AspNetCore.Annotations;
+
 namespace Demo3DAPI.Controllers
 {
     [ApiController]
@@ -24,7 +26,7 @@ namespace Demo3DAPI.Controllers
             return Ok(categories);
         }
 
-        [HttpGet("GetById/{id}")] 
+        [HttpGet("GetById/{id}")]
         [SwaggerOperation(Summary = "Xem một danh mục")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -37,8 +39,10 @@ namespace Demo3DAPI.Controllers
             return Ok(category);
         }
 
+        // 🔒 CHỈ ADMIN
         [HttpPost("Create")]
-        [SwaggerOperation(Summary = "Thêm danh mục mới")]
+        [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Thêm danh mục mới (Admin only)")]
         public async Task<IActionResult> Create([FromBody] CreateCategoryDTO createDto)
         {
             try
@@ -46,14 +50,16 @@ namespace Demo3DAPI.Controllers
                 var newCategory = await _categoryService.CreateCategory(createDto);
                 return CreatedAtAction(nameof(GetById), new { id = newCategory.ID }, newCategory);
             }
-            catch (InvalidOperationException ex) 
+            catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
 
+        // 🔒 CHỈ ADMIN
         [HttpPut("Update/{id}")]
-        [SwaggerOperation(Summary = "Sửa danh mục")]
+        [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Sửa danh mục (Admin only)")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDTO updateDto)
         {
             var result = await _categoryService.UpdateCategory(id, updateDto);
@@ -64,8 +70,10 @@ namespace Demo3DAPI.Controllers
             return Ok(new { message = "Category updated successfully." });
         }
 
+        // 🔒 CHỈ ADMIN
         [HttpDelete("Delete/{id}")]
-        [SwaggerOperation(Summary = "Xóa danh mục")]
+        [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Xóa danh mục (Admin only)")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _categoryService.DeleteCategory(id);

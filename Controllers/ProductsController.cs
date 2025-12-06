@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // Cần cái này để bảo mật
 using Demo3DAPI.Interfaces;
 using Demo3DAPI.DTOs;
-using Demo3DAPI.Models; 
-using Swashbuckle.AspNetCore.Annotations; 
+using Demo3DAPI.Models;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Demo3DAPI.Controllers
 {
@@ -17,17 +18,17 @@ namespace Demo3DAPI.Controllers
             _productService = productService;
         }
 
-        
+        // Ai cũng xem được, không cần đăng nhập
         [HttpGet]
         [SwaggerOperation(Summary = "Lấy danh sách sản phẩm", Description = "Trả về danh sách tất cả sản phẩm hiện có")]
-        [SwaggerResponse(200, "Lấy dữ liệu thành công", typeof(IEnumerable<Product>))] // Giả sử model trả về là Product
+        [SwaggerResponse(200, "Lấy dữ liệu thành công", typeof(IEnumerable<Product>))]
         public async Task<IActionResult> GetAll()
         {
             var products = await _productService.GetAllProducts();
             return Ok(products);
         }
 
-        
+        // Ai cũng xem được
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Lấy chi tiết sản phẩm", Description = "Tìm và trả về thông tin sản phẩm theo ID")]
         [SwaggerResponse(200, "Tìm thấy sản phẩm", typeof(Product))]
@@ -42,9 +43,10 @@ namespace Demo3DAPI.Controllers
             return Ok(product);
         }
 
-        
+        // 🔒 CHỈ ADMIN ĐƯỢC THÊM
         [HttpPost]
-        [SwaggerOperation(Summary = "Thêm sản phẩm mới", Description = "Tạo mới một sản phẩm vào cơ sở dữ liệu")]
+        [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Thêm sản phẩm mới (Admin only)")]
         [SwaggerResponse(201, "Tạo thành công", typeof(Product))]
         [SwaggerResponse(400, "Dữ liệu đầu vào không hợp lệ")]
         public async Task<IActionResult> Create([FromBody] CreateProductDTO productDto)
@@ -55,15 +57,15 @@ namespace Demo3DAPI.Controllers
             }
 
             var newProduct = await _productService.CreateProduct(productDto);
-           
+
             return CreatedAtAction(nameof(GetById), new { id = newProduct.ID }, newProduct);
         }
 
-        
+        // 🔒 CHỈ ADMIN ĐƯỢC SỬA
         [HttpPut("{id}")]
-        [SwaggerOperation(Summary = "Cập nhật sản phẩm", Description = "Sửa thông tin sản phẩm dựa trên ID")]
+        [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Cập nhật sản phẩm (Admin only)")]
         [SwaggerResponse(200, "Cập nhật thành công")]
-        [SwaggerResponse(400, "Dữ liệu không hợp lệ")]
         [SwaggerResponse(404, "Không tìm thấy sản phẩm để sửa")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDTO productDto)
         {
@@ -82,9 +84,10 @@ namespace Demo3DAPI.Controllers
             return Ok("Cập nhật thành công!");
         }
 
-        
+        // 🔒 CHỈ ADMIN ĐƯỢC XÓA
         [HttpDelete("{id}")]
-        [SwaggerOperation(Summary = "Xóa sản phẩm", Description = "Xóa hoàn toàn sản phẩm khỏi hệ thống theo ID")]
+        [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Xóa sản phẩm (Admin only)")]
         [SwaggerResponse(200, "Xóa thành công")]
         [SwaggerResponse(404, "Không tìm thấy sản phẩm để xóa")]
         public async Task<IActionResult> Delete(int id)
