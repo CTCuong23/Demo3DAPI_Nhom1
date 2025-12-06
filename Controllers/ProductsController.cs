@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Demo3DAPI.Interfaces;
 using Demo3DAPI.DTOs;
+using Demo3DAPI.Models; // Nhớ using Model để swagger nhận diện type return
+using Swashbuckle.AspNetCore.Annotations; // Thư viện cho Swagger
 
 namespace Demo3DAPI.Controllers
 {
@@ -15,16 +17,21 @@ namespace Demo3DAPI.Controllers
             _productService = productService;
         }
 
-        // 1. GET: api/Products (Lấy danh sách)
+        // 1. GET ALL
         [HttpGet]
+        [SwaggerOperation(Summary = "Lấy danh sách sản phẩm", Description = "Trả về danh sách tất cả sản phẩm hiện có")]
+        [SwaggerResponse(200, "Lấy dữ liệu thành công", typeof(IEnumerable<Product>))] // Giả sử model trả về là Product
         public async Task<IActionResult> GetAll()
         {
             var products = await _productService.GetAllProducts();
             return Ok(products);
         }
 
-        // 2. GET: api/Products/5 (Lấy 1 cái theo ID)
+        // 2. GET BY ID
         [HttpGet("{id}")]
+        [SwaggerOperation(Summary = "Lấy chi tiết sản phẩm", Description = "Tìm và trả về thông tin sản phẩm theo ID")]
+        [SwaggerResponse(200, "Tìm thấy sản phẩm", typeof(Product))]
+        [SwaggerResponse(404, "Không tìm thấy sản phẩm")]
         public async Task<IActionResult> GetById(int id)
         {
             var product = await _productService.GetProductById(id);
@@ -35,8 +42,11 @@ namespace Demo3DAPI.Controllers
             return Ok(product);
         }
 
-        // 3. POST: api/Products (Thêm mới)
+        // 3. CREATE
         [HttpPost]
+        [SwaggerOperation(Summary = "Thêm sản phẩm mới", Description = "Tạo mới một sản phẩm vào cơ sở dữ liệu")]
+        [SwaggerResponse(201, "Tạo thành công", typeof(Product))]
+        [SwaggerResponse(400, "Dữ liệu đầu vào không hợp lệ")]
         public async Task<IActionResult> Create([FromBody] CreateProductDTO productDto)
         {
             if (!ModelState.IsValid)
@@ -45,12 +55,16 @@ namespace Demo3DAPI.Controllers
             }
 
             var newProduct = await _productService.CreateProduct(productDto);
-            // Trả về code 201 Created
+            // Trả về 201 Created kèm theo thông tin sản phẩm vừa tạo
             return CreatedAtAction(nameof(GetById), new { id = newProduct.ID }, newProduct);
         }
 
-        // 4. PUT: api/Products/5 (Sửa)
+        // 4. UPDATE
         [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Cập nhật sản phẩm", Description = "Sửa thông tin sản phẩm dựa trên ID")]
+        [SwaggerResponse(200, "Cập nhật thành công")]
+        [SwaggerResponse(400, "Dữ liệu không hợp lệ")]
+        [SwaggerResponse(404, "Không tìm thấy sản phẩm để sửa")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDTO productDto)
         {
             if (!ModelState.IsValid)
@@ -68,8 +82,11 @@ namespace Demo3DAPI.Controllers
             return Ok("Cập nhật thành công!");
         }
 
-        // 5. DELETE: api/Products/5 (Xóa)
+        // 5. DELETE
         [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Xóa sản phẩm", Description = "Xóa hoàn toàn sản phẩm khỏi hệ thống theo ID")]
+        [SwaggerResponse(200, "Xóa thành công")]
+        [SwaggerResponse(404, "Không tìm thấy sản phẩm để xóa")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _productService.DeleteProduct(id);

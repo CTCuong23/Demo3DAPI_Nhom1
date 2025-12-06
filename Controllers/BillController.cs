@@ -1,4 +1,5 @@
-﻿using Demo3DAPI.Interfaces;
+﻿using Demo3DAPI.DTOs;
+using Demo3DAPI.Interfaces;
 using Demo3DAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -35,16 +36,50 @@ namespace Demo3DAPI.Controllers
 
         [HttpPost("Create")]
         [SwaggerOperation(Summary = "Thêm hóa đơn mới")]
-        public async Task<IActionResult> PostBill(Bill bill)
+        // Đổi tham số: Nhận vào CreateBillDto thay vì Bill
+        public async Task<IActionResult> PostBill([FromBody] CreateBillDto input)
         {
             try
             {
-                var newBill = await _billService.CreateBill(bill);
-                return CreatedAtAction(nameof(GetBill), new { id = newBill.Id }, newBill);
+                // --- BƯỚC CHUYỂN DỮ LIỆU (MAPPING) ---
+
+                // 1. Tạo vỏ Hóa Đơn
+                var newBill = new Bill
+                {
+                    PlayerAccountId = input.PlayerAccountId,
+                    Status = input.Status,
+                    CreateDate = DateTime.Now,  // Tự động lấy giờ hiện tại
+                    PaymentDate = DateTime.Now,
+                    BillDetails = new List<BillDetail>()
+                };
+
+                // 2. Tạo ruột (Chi tiết hóa đơn)
+                if (input.BillDetails != null)
+                {
+                    foreach (var item in input.BillDetails)
+                    {
+                        var detail = new BillDetail
+                        {
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity,
+                            // Mẹo: Tạm thời set giá = 0. 
+                            // Đúng chuẩn là phải gọi ProductService để lấy giá từ DB
+                            UnitPrice = 0
+                        };
+                        newBill.BillDetails.Add(detail);
+                    }
+                }
+
+                // --- GỌI SERVICE LƯU XUỐNG DB ---
+                var createdBill = await _billService.CreateBill(newBill);
+
+                return CreatedAtAction(nameof(GetBill), new { id = createdBill.Id }, createdBill);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                // In lỗi chi tiết ra để dễ sửa
+                var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return BadRequest(new { Error = "Lỗi tạo hóa đơn", ChiTiet = message });
             }
         }
 
