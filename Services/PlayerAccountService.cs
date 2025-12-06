@@ -15,50 +15,173 @@ namespace Demo3DAPI.Services
             _context = context;
         }
 
-        public async Task<PlayerAccount> CreateAccount(CreatePlayerAccountDto accountDto)
+        public async Task<LoginResponseDto?> Login(LoginDto loginDto, IJwtService jwtService)
+        {
+            var account = await _context.PlayerAccounts
+                .Include(a => a.Role)
+                .FirstOrDefaultAsync(a => a.UserName == loginDto.UserName);
+
+            if (account == null) return null;
+
+            // Kiểm tra mật khẩu bằng BCrypt
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, account.Password);
+
+            if (!isPasswordValid) return null;
+
+            // Tạo Token
+            var token = jwtService.GenerateToken(account);
+
+            return new LoginResponseDto
+            {
+                ID = account.ID,
+                UserName = account.UserName,
+                FullName = account.FullName,
+                RoleID = account.RoleID,
+                RoleName = account.Role?.Name,
+                Token = token,
+                Message = "Login successful"
+            };
+        }
+
+        public async Task<PlayerAccountResponseDto> Register(RegisterDto registerDto)
+        {
+            var existingAccount = await _context.PlayerAccounts
+                .FirstOrDefaultAsync(a => a.UserName == registerDto.UserName);
+
+            if (existingAccount != null)
+            {
+                throw new InvalidOperationException($"Username '{registerDto.UserName}' already exists.");
+            }
+
+            // Mã hóa mật khẩu trước khi lưu
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+            var account = new PlayerAccount
+            {
+                UserName = registerDto.UserName,
+                Password = hashedPassword,
+                FullName = registerDto.FullName,
+                PhoneNumber = registerDto.PhoneNumber,
+                RoleID = 2 // Mặc định là User
+            };
+
+            _context.PlayerAccounts.Add(account);
+            await _context.SaveChangesAsync();
+
+            var createdAccount = await _context.PlayerAccounts
+                .Include(a => a.Role)
+                .FirstOrDefaultAsync(a => a.ID == account.ID);
+
+            return new PlayerAccountResponseDto
+            {
+                ID = account.ID,
+                UserName = account.UserName,
+                FullName = account.FullName,
+                PhoneNumber = account.PhoneNumber,
+                RoleID = account.RoleID,
+                RoleName = createdAccount?.Role?.Name,
+                Characters = new List<CharacterBasicDto>()
+            };
+        }
+
+        // Logic tạo tài khoản của Admin (gần giống Register)
+        public async Task<PlayerAccountResponseDto> CreateAccount(CreatePlayerAccountDto accountDto)
         {
             var existingAccount = await _context.PlayerAccounts
                 .FirstOrDefaultAsync(a => a.UserName == accountDto.UserName);
-            
+
             if (existingAccount != null)
             {
                 throw new InvalidOperationException($"Username '{accountDto.UserName}' already exists.");
             }
 
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(accountDto.Password);
+
             var account = new PlayerAccount
             {
                 UserName = accountDto.UserName,
-                Password = accountDto.Password,
+                Password = hashedPassword,
                 FullName = accountDto.FullName,
-                PhoneNumber = accountDto.PhoneNumber
+                PhoneNumber = accountDto.PhoneNumber,
+                RoleID = 2
             };
 
             _context.PlayerAccounts.Add(account);
             await _context.SaveChangesAsync();
-            return account;
+
+            var createdAccount = await _context.PlayerAccounts
+                .Include(a => a.Role)
+                .FirstOrDefaultAsync(a => a.ID == account.ID);
+
+            return new PlayerAccountResponseDto
+            {
+                ID = account.ID,
+                UserName = account.UserName,
+                FullName = account.FullName,
+                PhoneNumber = account.PhoneNumber,
+                RoleID = account.RoleID,
+                RoleName = createdAccount?.Role?.Name,
+                Characters = new List<CharacterBasicDto>()
+            };
         }
 
         public async Task<bool> DeleteAccount(int id)
         {
-            var account = await _context.PlayerAccounts.FindAsync(id);
+            var account = await _context.PlayerAccounts
+                .Include(a => a.Role)
+                .FirstOrDefaultAsync(a => a.ID == id);
+
             if (account == null) return false;
+
+            // Không cho phép xóa Admin
+            if (account.RoleID == 1 || account.Role?.Name == "Admin")
+            {
+                throw new InvalidOperationException("Cannot delete Admin account.");
+            }
 
             _context.PlayerAccounts.Remove(account);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<PlayerAccount?> GetAccountById(int id)
+        public async Task<PlayerAccountResponseDto?> GetAccountById(int id)
         {
-            return await _context.PlayerAccounts
+            var account = await _context.PlayerAccounts
+                .Include(a => a.Role)
                 .Include(a => a.Characters)
                 .FirstOrDefaultAsync(a => a.ID == id);
+
+            if (account == null) return null;
+
+            return new PlayerAccountResponseDto
+            {
+                ID = account.ID,
+                UserName = account.UserName,
+                FullName = account.FullName,
+                PhoneNumber = account.PhoneNumber,
+                RoleID = account.RoleID,
+                RoleName = account.Role?.Name,
+                Characters = account.Characters.Select(c => new CharacterBasicDto
+                {
+                    ID = c.ID,
+                    Name = c.Name,
+                    Level = c.Level
+                }).ToList()
+            };
         }
 
-        public async Task<IEnumerable<PlayerAccount>> GetAllAccounts()
+        public async Task<IEnumerable<PlayerAccountBasicDto>> GetAllAccounts()
         {
             return await _context.PlayerAccounts
-                .Include(a => a.Characters)
+                .Include(a => a.Role)
+                .Select(a => new PlayerAccountBasicDto
+                {
+                    ID = a.ID,
+                    UserName = a.UserName,
+                    FullName = a.FullName,
+                    RoleID = a.RoleID,
+                    RoleName = a.Role != null ? a.Role.Name : null
+                })
                 .ToListAsync();
         }
 
@@ -67,8 +190,11 @@ namespace Demo3DAPI.Services
             var account = await _context.PlayerAccounts.FindAsync(id);
             if (account == null) return false;
 
-            account.FullName = accountDto.FullName;
-            account.PhoneNumber = accountDto.PhoneNumber;
+            if (accountDto.FullName != null)
+                account.FullName = accountDto.FullName;
+
+            if (accountDto.PhoneNumber != null)
+                account.PhoneNumber = accountDto.PhoneNumber;
 
             _context.Entry(account).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -76,4 +202,3 @@ namespace Demo3DAPI.Services
         }
     }
 }
-
