@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Demo3DAPI.Interfaces;
 using Demo3DAPI.DTOs;
-using Demo3DAPI.Models; // Nhớ using Model để swagger nhận diện type return
-using Swashbuckle.AspNetCore.Annotations; // Thư viện cho Swagger
+using Demo3DAPI.Models; 
+using Swashbuckle.AspNetCore.Annotations; 
 
 namespace Demo3DAPI.Controllers
 {
@@ -17,7 +17,7 @@ namespace Demo3DAPI.Controllers
             _productService = productService;
         }
 
-        // 1. GET ALL
+        
         [HttpGet]
         [SwaggerOperation(Summary = "Lấy danh sách sản phẩm", Description = "Trả về danh sách tất cả sản phẩm hiện có")]
         [SwaggerResponse(200, "Lấy dữ liệu thành công", typeof(IEnumerable<Product>))] // Giả sử model trả về là Product
@@ -27,7 +27,7 @@ namespace Demo3DAPI.Controllers
             return Ok(products);
         }
 
-        // 2. GET BY ID
+        
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Lấy chi tiết sản phẩm", Description = "Tìm và trả về thông tin sản phẩm theo ID")]
         [SwaggerResponse(200, "Tìm thấy sản phẩm", typeof(Product))]
@@ -42,7 +42,7 @@ namespace Demo3DAPI.Controllers
             return Ok(product);
         }
 
-        // 3. CREATE
+        
         [HttpPost]
         [SwaggerOperation(Summary = "Thêm sản phẩm mới", Description = "Tạo mới một sản phẩm vào cơ sở dữ liệu")]
         [SwaggerResponse(201, "Tạo thành công", typeof(Product))]
@@ -55,11 +55,11 @@ namespace Demo3DAPI.Controllers
             }
 
             var newProduct = await _productService.CreateProduct(productDto);
-            // Trả về 201 Created kèm theo thông tin sản phẩm vừa tạo
+           
             return CreatedAtAction(nameof(GetById), new { id = newProduct.ID }, newProduct);
         }
 
-        // 4. UPDATE
+        
         [HttpPut("{id}")]
         [SwaggerOperation(Summary = "Cập nhật sản phẩm", Description = "Sửa thông tin sản phẩm dựa trên ID")]
         [SwaggerResponse(200, "Cập nhật thành công")]
@@ -82,7 +82,7 @@ namespace Demo3DAPI.Controllers
             return Ok("Cập nhật thành công!");
         }
 
-        // 5. DELETE
+        
         [HttpDelete("{id}")]
         [SwaggerOperation(Summary = "Xóa sản phẩm", Description = "Xóa hoàn toàn sản phẩm khỏi hệ thống theo ID")]
         [SwaggerResponse(200, "Xóa thành công")]

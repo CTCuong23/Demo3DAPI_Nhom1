@@ -17,7 +17,7 @@ namespace Demo3DAPI.Services
         public async Task<IEnumerable<Bill>> GetAllBills()
         {
             return await _context.Bills
-                .Include(b => b.PlayerAccount) // Kèm thông tin người chơi
+                .Include(b => b.PlayerAccount)
                 .ToListAsync();
         }
 
@@ -30,7 +30,7 @@ namespace Demo3DAPI.Services
 
         public async Task<Bill> CreateBill(Bill bill)
         {
-            bill.CreateDate = DateTime.Now; // Tự động lấy ngày hiện tại
+            bill.CreateDate = DateTime.Now; 
             _context.Bills.Add(bill);
             await _context.SaveChangesAsync();
             return bill;
@@ -43,7 +43,7 @@ namespace Demo3DAPI.Services
 
             existingBill.PaymentDate = bill.PaymentDate;
             existingBill.Status = bill.Status;
-            // Không cho phép sửa PlayerAccountId hay CreateDate tùy tiện
+           
 
             _context.Entry(existingBill).State = EntityState.Modified;
             await _context.SaveChangesAsync();

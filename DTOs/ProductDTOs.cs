@@ -2,7 +2,7 @@
 
 namespace Demo3DAPI.DTOs
 {
-    // DTO dùng để tạo mới (không cần ID)
+   
     public class CreateProductDTO
     {
         [Required]
@@ -14,7 +14,7 @@ namespace Demo3DAPI.DTOs
         public int CategoryID { get; set; }
     }
 
-    // DTO dùng để cập nhật (giống tạo mới nhưng tách ra để sau này dễ mở rộng)
+    
     public class UpdateProductDTO
     {
         [Required]
