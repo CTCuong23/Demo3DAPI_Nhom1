@@ -61,7 +61,7 @@ namespace Demo3DAPI.Services
 
             category.CategoryName = categoryDto.CategoryName ?? ""; 
             category.CategoryDescription = categoryDto.CategoryDescription ?? ""; 
-            _context.Entry(category).State = EntityState.Modified;
+            //_context.Entry(category).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return true;
         }
