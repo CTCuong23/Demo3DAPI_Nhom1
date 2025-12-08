@@ -18,6 +18,7 @@ namespace Demo3DAPI.Services
         {
             return await _context.Bills
                 .Include(b => b.PlayerAccount)
+                .Include(b => b.BillDetails)
                 .ToListAsync();
         }
 
